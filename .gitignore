@@ -1,0 +1,13 @@
+internal-docs/
+.claude
+CLAUDE.md
+.venv/
+__pycache__/
+index/
+.env
+app.py
+.streamlit/
+corpus/raw/
+corpus/chunks.jsonl
+node_modules/
+presentation/

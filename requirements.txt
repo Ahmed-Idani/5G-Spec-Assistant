@@ -1,0 +1,10 @@
+# Install torch CPU build first:
+#   uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+python-docx>=1.1
+sentence-transformers>=3.0
+chromadb>=1.0
+rank-bm25>=0.2.2
+openai>=1.40
+python-dotenv>=1.0
+fastapi>=0.115
+uvicorn[standard]>=0.30
