@@ -16,7 +16,7 @@ Ask questions about 5G and get answers grounded **only** in two official 3GPP sp
 ## Run it
 
 ```bash
-git clone https://github.com/HIJOdelIDANII/5G-RAG.git
+git clone https://github.com/Ahmed-Idani/5G-RAG.git
 cd 5G-RAG
 
 make setup                  # install Python + frontend dependencies
