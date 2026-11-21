@@ -1,4 +1,8 @@
-# RAG Chatbot for 3GPP 5G Specifications
+# 5G Spec Assistant
+
+**A RAG chatbot for the 3GPP 5G specifications (TS 23.501 + TS 24.501), with a cited answer for every question.**
+
+![Home screen](docs/screenshot-home.png)
 
 Ask questions about 5G and get answers grounded **only** in two official 3GPP specifications, with a citation (spec + section) after every statement. When the documents don't cover a question, the chatbot says *"I could not find this information in the documents."*
 
@@ -6,6 +10,12 @@ Ask questions about 5G and get answers grounded **only** in two official 3GPP sp
 - **Retrieval:** hybrid search (bge-base-en-v1.5 vectors in ChromaDB + BM25), Reciprocal Rank Fusion, cross-encoder reranker, routing by spec
 - **Generation:** `openai/gpt-oss-120b` via Groq, with citation checks and explicit refusal
 - **App:** React frontend + FastAPI backend
+
+### Answers with clickable citations
+
+Each statement cites its section. Clicking a citation opens the exact passage in the Sources panel, with its relevance score.
+
+![Cited answer with the source passage open](docs/screenshot-answer.png)
 
 ## Requirements
 
@@ -16,8 +26,8 @@ Ask questions about 5G and get answers grounded **only** in two official 3GPP sp
 ## Run it
 
 ```bash
-git clone https://github.com/Ahmed-Idani/5G-RAG.git
-cd 5G-RAG
+git clone https://github.com/Ahmed-Idani/5G-Spec-Assistant.git
+cd 5G-Spec-Assistant
 
 make setup                  # install Python + frontend dependencies
 cp .env.example .env        # then put your key in .env:  LLM_API_KEY_GROK=gsk_...
