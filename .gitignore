@@ -7,7 +7,7 @@ index/
 .env
 app.py
 .streamlit/
-corpus/raw/
 corpus/chunks.jsonl
 node_modules/
 presentation/
+corpus/raw/.~lock*

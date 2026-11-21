@@ -21,7 +21,7 @@ cd 5G-RAG
 
 make setup                  # install Python + frontend dependencies
 cp .env.example .env        # then put your key in .env:  LLM_API_KEY_GROK=gsk_...
-make data                   # download the two 3GPP specs and parse them (~1 min)
+make data                   # parse the two 3GPP specs in corpus/raw into chunks (~1 min)
 make index                  # build the search indexes (one time, ~30–45 min on CPU)
 ```
 
@@ -59,3 +59,11 @@ rag/            retriever (routing, hybrid search, fusion, reranker) and generat
 api/server.py   FastAPI backend
 web/            React + TypeScript frontend
 ```
+
+## Corpus
+
+`corpus/raw/` contains the two specifications as published in the official 3GPP archive (© 3GPP Organizational Partners):
+- [TS 23.501 V18.12.0](https://www.3gpp.org/ftp/Specs/archive/23_series/23.501/23501-ic0.zip): `23501-ic0.docx`
+- [TS 24.501 V18.14.0](https://www.3gpp.org/ftp/Specs/archive/24_series/24.501/24501-ie0.zip): `24501-ie0.docx`
+
+If they are missing, `python -m ingest.download_specs` downloads them again.
