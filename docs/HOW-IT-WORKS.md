@@ -83,7 +83,7 @@ BM25 is a classic keyword ranking: rare words count more than common ones. Our t
 
 | Step | What it does | Key setting |
 |---|---|---|
-| **1. Routing** | Keyword rules decide which spec to search. NAS cues (cause, #9, T3510, message, 5GMM…) → TS 24.501. Architecture cues (role, AMF, slicing, reference point…) → TS 23.501. | A single spec only with **≥ 2 cues for it and 0 for the other**; otherwise both |
+| **1. Routing** | Counts keywords in the question. NAS keywords (cause, #9, T3510, message, 5GMM…) point to TS 24.501; architecture keywords (role, AMF, slicing, reference point…) point to TS 23.501. | One spec only with **2+ keywords for it and 0 for the other**; otherwise both (e.g. *cause #9 … 5GMM* → 24.501; *role of the AMF* → 23.501; registration + NAS messages + AMF → both) |
 | **2. Hybrid search** | Vector search and BM25 each return their top candidates | **20 + 20** |
 | **3. RRF fusion** | Merges the two lists using **only ranks**, because cosine and BM25 scores aren't comparable: `score = Σ 1/(60 + rank)` | k = 60 |
 | **4. Reranker** | A **cross-encoder** reads the question and each passage **together** and scores relevance from 0 to 1 | top 20 rescored |
