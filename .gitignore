@@ -11,3 +11,4 @@ corpus/chunks.jsonl
 node_modules/
 presentation/
 corpus/raw/.~lock*
+eval/results/

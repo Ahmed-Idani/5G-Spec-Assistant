@@ -40,7 +40,7 @@ NAS_PATTERNS = [
     r"\bnas\b", r"\b5gmm\b", r"\b5gsm\b", r"\bcause\b", r"#\d+", r"\bt3[0-9]{3}\b",
     r"\btimer", r"\bmessage", r"\binformation element", r"\bie\b", r"\boctet", r"\bcod(e|ing)\b",
     r"\b(request|accept|reject|complete|command)\b", r"\bstate\b", r"\b5gmm-[a-z-]+",
-    r"\bsecurity mode\b", r"\bderegistration\b", r"\babnormal case", r"\bmessage type",
+    r"\bsecurity mode\b", r"\bde-?registration\b", r"\babnormal case", r"\bmessage type",
     r"\bue policy\b", r"\bsor\b", r"\bpdu session (establishment|modification|release) (request|accept|reject)",
 ]
 # TS 23.501 = system architecture (Stage 2): NFs, reference points, concepts.
@@ -49,10 +49,11 @@ ARCH_PATTERNS = [
     r"\bservice[- ]based\b", r"\binterface\b", r"\bn\d{1,2}\b", r"\b(smf|upf|pcf|udm|ausf|nrf|nssf|nef|udr|scp|sepp|nwdaf|af|chf)\b",
     r"\bqos (model|flow|characteristics)", r"\b5qi\b", r"\bslic", r"\bs-nssai\b", r"\broaming\b",
     r"\bselection\b", r"\bdeploy", r"\bnon-public network|\bnpn\b|\bsnpn\b", r"\bedge computing",
-    r"\bnetwork slice", r"\buser plane\b", r"\bcontrol plane\b", r"\bconcept",
-    # procedures and the AMF are described in both specs: they pull cross-spec questions to "both"
-    r"\bprocedure", r"\bamf\b",
+    r"\bnetwork slice", r"\buser plane\b", r"\bcontrol plane\b", r"\bconcept", r"\bamf\b",
 ]
+# "procedure" is deliberately NOT a signal: procedures are described in both specs
+# (evaluation showed that counting it as architecture misrouted NAS procedure questions).
+MIN_SIGNALS = 2   # a single spec is chosen only on >= 2 signals for it and none for the other
 EXPLICIT_SPEC = {"TS 23.501": r"23\.?501", "TS 24.501": r"24\.?501"}
 
 
@@ -65,12 +66,13 @@ def route(question: str) -> tuple[list[str], dict]:
     nas = sum(bool(re.search(p, q)) for p in NAS_PATTERNS)
     arch = sum(bool(re.search(p, q)) for p in ARCH_PATTERNS)
     info = {"nas_score": nas, "arch_score": arch}
-    # One side clearly dominant -> that spec only; otherwise (tie, both, none) -> both.
-    if nas >= 1 and arch == 0 or nas >= arch + 2:
+    # Conservative: filter to one spec only when the evidence is clear; a wrong filter hides the
+    # right spec entirely, while searching both only costs a little precision.
+    if nas >= MIN_SIGNALS and arch == 0:
         return ["TS 24.501"], {**info, "reason": "NAS signals"}
-    if arch >= 1 and nas == 0 or arch >= nas + 2:
+    if arch >= MIN_SIGNALS and nas == 0:
         return ["TS 23.501"], {**info, "reason": "architecture signals"}
-    return list(SPECS), {**info, "reason": "mixed or no signal -> both specs"}
+    return list(SPECS), {**info, "reason": "weak or mixed signals -> both specs"}
 
 
 # ---------------------------------------------------------------- retriever
@@ -138,7 +140,8 @@ class Retriever:
 
     # -- full pipeline ----------------------------------------------------------
     def retrieve(self, question: str, k: int = 5, hybrid: bool = True, rerank: bool = True,
-                 route_query: bool = True, n_candidates: int = N_CANDIDATES) -> RetrievalResult:
+                 route_query: bool = True, n_candidates: int = N_CANDIDATES,
+                 rerank_pool: int | None = None) -> RetrievalResult:
         t: dict[str, float] = {}
         t0 = time.perf_counter()
         specs, info = route(question) if route_query else (list(SPECS), {"reason": "routing disabled"})
@@ -159,7 +162,7 @@ class Retriever:
 
         if rerank and self.reranker is not None:
             t1 = time.perf_counter()
-            pool = candidates[:n_candidates]
+            pool = candidates[:rerank_pool or n_candidates]  # rerank_pool=None: top n_candidates
             scores = self.reranker.predict([(question, self.chunks[cid]["text"]) for cid, _ in pool])
             candidates = sorted(zip([c for c, _ in pool], map(float, scores)), key=lambda x: -x[1])
             t["rerank"] = time.perf_counter() - t1

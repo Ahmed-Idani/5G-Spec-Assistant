@@ -17,6 +17,11 @@ Each statement cites its section. Clicking a citation opens the exact passage in
 
 ![Cited answer with the source passage open](docs/screenshot-answer.png)
 
+## Documentation
+
+- [How it works](docs/HOW-IT-WORKS.md): architecture, model choices, retrieval and generation in detail, with diagrams
+- [Evaluation](docs/EVALUATION.md): test set, retrieval and generation metrics, ablations, edge cases
+
 ## Requirements
 
 - Python 3.11+ and Node.js 20+
@@ -66,6 +71,7 @@ cd web && npm run dev                      # terminal 2: http://localhost:5173
 ```
 ingest/         download the specs, parse DOCX into chunks, build the indexes
 rag/            retriever (routing, hybrid search, fusion, reranker) and generator (prompt, LLM, citations)
+eval/           test set and evaluation scripts
 api/server.py   FastAPI backend
 web/            React + TypeScript frontend
 ```
